@@ -1,0 +1,400 @@
+/* Family Cup: chunky, toy-like game UI. Sizes use vh so every screen fits a landscape tablet. */
+:root {
+  --ink: #16182b;
+  --gold: #ffd23f;
+  --panel: #2a2e5c;
+  --soft: #c5caff;
+}
+* { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+html, body {
+  margin: 0; height: 100%; overflow: hidden; color: #fff;
+  background: radial-gradient(circle at 50% 25%, #2f3475, #14152e 75%) fixed #14152e;
+  font-family: 'Fredoka', 'Baloo 2', 'Arial Rounded MT Bold', 'Trebuchet MS', system-ui, sans-serif;
+  font-weight: 700;
+  user-select: none; -webkit-user-select: none; -webkit-touch-callout: none;
+  touch-action: none; overscroll-behavior: none;
+}
+#app { position: fixed; inset: 0; }
+button { font: inherit; color: inherit; background: none; border: 0; padding: 0; cursor: pointer; }
+svg.portrait, .face, .zface, .pface, .lface, .podface, .wface { display: block; border-radius: 50%; }
+
+#rotate {
+  display: none; position: fixed; inset: 0; z-index: 99; background: #14152e;
+  flex-direction: column; align-items: center; justify-content: center; gap: 3vw; font-size: 6vw; text-align: center;
+}
+#rotate div { font-size: 22vw; animation: spin 2s ease-in-out infinite; }
+@keyframes spin { 50% { transform: rotate(90deg); } }
+@media (orientation: portrait) { #rotate { display: flex; } }
+
+/* ---------- scenes ---------- */
+.scene {
+  position: absolute; inset: 0; overflow: hidden; padding: 3vh 3vw;
+  display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 2.4vh; text-align: center;
+}
+.scene.enter > * { animation: pop .55s cubic-bezier(.2, 1.6, .4, 1) backwards; }
+.scene.enter > :nth-child(2) { animation-delay: .07s; }
+.scene.enter > :nth-child(3) { animation-delay: .14s; }
+.scene.enter > :nth-child(4) { animation-delay: .21s; }
+.scene.enter > :nth-child(5) { animation-delay: .28s; }
+.scene.enter > :nth-child(6) { animation-delay: .35s; }
+.scene.enter > :nth-child(7) { animation-delay: .42s; }
+@keyframes pop { from { transform: scale(.3); opacity: 0; } }
+
+.title {
+  font-size: 9.5vh; line-height: 1; color: var(--gold); font-weight: 700; letter-spacing: .3vh;
+  text-shadow: 0 .5vh 0 var(--ink), .5vh 0 0 var(--ink), -.5vh 0 0 var(--ink), 0 -.5vh 0 var(--ink), 0 1.2vh 0 var(--ink);
+}
+.title.small { font-size: 7vh; }
+.note { font-size: 2.8vh; color: var(--soft); }
+
+.btn {
+  color: var(--ink); background: #fff;
+  border: .55vh solid var(--ink); border-radius: 3vh; padding: 1vh 2.6vh; font-size: 3vh;
+  box-shadow: 0 .9vh 0 var(--ink); transition: transform .06s, box-shadow .06s;
+}
+.btn:active { transform: translateY(.7vh) scale(.96); box-shadow: 0 .2vh 0 var(--ink); }
+.btn.go { background: #38d273; font-size: 5vh; padding: 1.3vh 7vh; border-radius: 99vh; }
+.btn.round { width: 8vh; height: 8vh; padding: 0; border-radius: 50%; font-size: 4.6vh; line-height: 1; }
+
+/* ---------- setup ---------- */
+.seats { display: flex; gap: 2vw; }
+.seat {
+  position: relative; width: 21vw; height: 37vh; border-radius: 4vh; background: var(--c); color: var(--ink);
+  border: .6vh solid var(--ink); box-shadow: 0 1.1vh 0 var(--ink);
+  display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 1vh; padding: 1vh;
+}
+.seat.off { background: rgba(255, 255, 255, .04); border-style: dashed; border-color: #6a70a8; box-shadow: none; color: #9aa0d8; font-size: 3vh; }
+.seat.off:active { background: rgba(255, 255, 255, .12); }
+.seat .plus { font-size: 10vh; line-height: 1; }
+.sface { width: 17vh; height: 17vh; border-radius: 50%; border: .6vh solid var(--ink); background: #fff; transition: transform .1s; }
+.sface .face { width: 100%; height: 100%; }
+.sface:active { transform: scale(.88) rotate(-6deg); }
+.spick { display: flex; align-items: center; gap: .8vh; width: 100%; justify-content: space-between; }
+.sname { font-size: 2.9vh; line-height: 1.05; }
+.sname small { display: block; font-size: 1.8vh; opacity: .75; }
+.btn.arrow { width: 5.5vh; height: 5.5vh; padding: 0; border-radius: 50%; font-size: 4vh; line-height: 1; border-width: .4vh; box-shadow: 0 .5vh 0 var(--ink); flex: none; }
+.btn.junior { font-size: 2.1vh; padding: .5vh 1.6vh; border-width: .4vh; box-shadow: 0 .5vh 0 var(--ink); background: rgba(255, 255, 255, .55); }
+.btn.junior.lit { background: var(--gold); }
+.btn.x { position: absolute; top: -1.6vh; right: -1.6vh; width: 5.5vh; height: 5.5vh; padding: 0; border-radius: 50%; font-size: 2.6vh; background: #ff5d62; color: #fff; }
+.opts { display: flex; align-items: center; gap: 3vw; }
+.stepper { display: flex; align-items: center; gap: 1.6vh; }
+.count { min-width: 11vh; line-height: 1; }
+.count b { display: block; font-size: 7vh; color: var(--gold); }
+.count span { font-size: 2.3vh; color: var(--soft); }
+.sidebtns { display: flex; flex-direction: column; align-items: center; gap: 1.6vh; }
+.btn.voice { font-size: 2vh; padding: .6vh 1.4vh; border-width: .4vh; box-shadow: 0 .5vh 0 var(--ink); max-width: 20vh; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.tiles { display: flex; gap: 1.2vh; flex-wrap: wrap; justify-content: center; max-width: 60vw; }
+.btn.tile { display: flex; flex-direction: column; align-items: center; width: 15vh; padding: .7vh; font-size: 1.9vh; line-height: 1.1; }
+.tile i { font-style: normal; font-size: 4.6vh; }
+.tile.off { filter: grayscale(1); opacity: .4; }
+
+/* ---------- intro ---------- */
+.gicon { font-size: 15vh; line-height: 1; animation: bob 1s ease-in-out infinite alternate; }
+@keyframes bob { to { transform: translateY(-1.6vh) rotate(5deg); } }
+.how { display: flex; flex-direction: column; gap: 1vh; background: var(--panel); border: .5vh solid var(--ink); border-radius: 3vh; padding: 2vh 4vh; max-width: 82vw; }
+.how div { font-size: 3.2vh; font-weight: 500; }
+.badge { background: #ff5d62; border: .5vh solid var(--ink); border-radius: 99vh; padding: .6vh 3vh; font-size: 3vh; transform: rotate(-3deg); }
+.punlist { display: flex; gap: 1.5vh; flex-wrap: wrap; justify-content: center; }
+.pun { display: flex; align-items: center; gap: 1vh; background: var(--c); color: var(--ink); border: .45vh solid var(--ink); border-radius: 99vh; padding: .4vh 1.8vh .4vh .4vh; font-size: 2.6vh; }
+.pface { width: 5vh; height: 5vh; }
+
+/* ---------- lanes ---------- */
+.lbox { width: 88vw; display: flex; flex-direction: column; gap: 1.4vh; }
+.lane { display: grid; grid-template-columns: 1fr 8vh 9vh; align-items: center; column-gap: 2vh; }
+.ltrack { position: relative; height: 8vh; background: #0e1026; border: .5vh solid var(--ink); border-radius: 99vh; }
+.lfill { position: absolute; left: 0; top: 0; bottom: 0; background: var(--c); border-radius: 99vh; transition: width 1.3s cubic-bezier(.3, 1.3, .5, 1); }
+.ltoken { position: absolute; top: 50%; width: 10vh; height: 10vh; transform: translate(-55%, -50%); transition: left 1.3s cubic-bezier(.3, 1.3, .5, 1); }
+.ltoken .lface { width: 100%; height: 100%; border: .5vh solid var(--ink); background: #fff; }
+.ltoken.hop { animation: hop .45s ease-in-out 1.3s 3; }
+@keyframes hop { 50% { transform: translate(-55%, -85%); } }
+.lflag { position: absolute; right: 1vh; top: 50%; transform: translateY(-50%); font-size: 4.5vh; opacity: .6; }
+.lscore { font-size: 6vh; color: var(--gold); }
+.lgain { font-size: 4vh; color: #38d273; }
+.ldet { position: absolute; right: 8vh; top: 50%; transform: translateY(-50%); font-size: 2.3vh; color: var(--soft); font-weight: 500; white-space: nowrap; }
+.ldet.lleft { right: auto; left: 3vh; color: #fff; text-shadow: 0 .3vh 0 var(--ink); }
+
+/* ---------- wheel ---------- */
+.wrow { display: flex; align-items: center; gap: 5vw; }
+.wwrap { position: relative; width: 68vh; height: 68vh; flex: none; }
+.wheel, .wheel svg { width: 100%; height: 100%; display: block; }
+.wheel svg { border-radius: 50%; filter: drop-shadow(0 1.2vh 0 var(--ink)); }
+.pointer { position: absolute; left: 50%; top: -4.5vh; transform: translateX(-50%); font-size: 8vh; line-height: 1; z-index: 2; color: #ff5d62; text-shadow: 0 .4vh 0 var(--ink); }
+.wside { width: 38vw; display: flex; flex-direction: column; align-items: center; gap: 3vh; }
+.wmsg { min-height: 20vh; display: flex; flex-direction: column; justify-content: center; align-items: center; gap: 1vh; }
+.wmsg .big { font-size: 5.5vh; color: var(--gold); display: flex; align-items: center; gap: 1.5vh; }
+.wmsg .line { font-size: 3vh; display: flex; align-items: center; gap: 1vh; }
+.wmsg .big .wface { width: 9vh; height: 9vh; border: .5vh solid var(--ink); }
+.wmsg .line .wface { width: 5vh; height: 5vh; }
+
+/* ---------- ceremony ---------- */
+.trophy { font-size: 22vh; line-height: 1; animation: bob 1s ease-in-out infinite alternate; }
+.podium { display: flex; gap: 3vh; align-items: flex-end; margin-top: 3vh; }
+.pod { display: flex; flex-direction: column; align-items: center; gap: .5vh; background: var(--c); color: var(--ink); border: .5vh solid var(--ink); border-radius: 3vh; padding: 1.2vh; font-size: 4vh; box-shadow: 0 .8vh 0 var(--ink); }
+.podface { width: 11vh; height: 11vh; border: .5vh solid var(--ink); background: #fff; }
+.pod.champ { transform: scale(1.3); margin: 0 3vh 2vh; animation: cheer .5s ease-in-out infinite alternate; }
+.confetti { position: fixed; top: -8vh; font-size: 5vh; pointer-events: none; animation: fall linear forwards; }
+@keyframes fall { to { transform: translateY(120vh) rotate(720deg); } }
+
+/* ---------- play arena ---------- */
+.arena { position: absolute; inset: 0; }
+.stage { position: relative; background: #0e1026; border: .55vh solid var(--ink); border-radius: 3.5vh; overflow: hidden; }
+.stagebox { display: flex; align-items: center; justify-content: center; }
+.slot { display: flex; }
+.pwrap { flex: 1; display: flex; min-width: 0; position: relative; }
+
+/* 2 or 3 players: stage on top, even row of zones along the bottom */
+.arena.edge { display: flex; flex-direction: column; padding: 1.2vh; gap: 1.4vh; }
+.arena.edge .stage { flex: 0 0 44%; }
+.arena.edge .stagebox { position: absolute; inset: 0; }
+.arena.edge .zrow { flex: 1; display: flex; gap: 1.4vh; min-height: 0; padding-bottom: 1vh; }
+.arena.edge .slot { flex: 1; min-width: 0; }
+
+/* 4 players: a zone in each corner, stage across the middle */
+.arena.corners .stage { position: absolute; inset: 1.2vh; }
+.arena.corners .stagebox { position: absolute; left: 0; right: 0; top: 35%; height: 30%; }
+.arena.corners .slot { position: absolute; width: 33%; height: 31%; z-index: 1; }
+.arena.corners .c0 { left: 2.6vh; bottom: 3.4vh; }
+.arena.corners .c1 { right: 2.6vh; bottom: 3.4vh; }
+.arena.corners .c2 { left: 2.6vh; top: 3.4vh; transform: rotate(180deg); }
+.arena.corners .c3 { right: 2.6vh; top: 3.4vh; transform: rotate(180deg); }
+
+.zone {
+  flex: 1; min-width: 0; position: relative; overflow: hidden; background: var(--c); color: var(--ink);
+  border: .6vh solid var(--ink); border-radius: 4vh; box-shadow: 0 1vh 0 var(--ink);
+  display: flex; flex-direction: column; align-items: center; justify-content: center; gap: .4vh;
+  text-align: center; padding: 1vh; transition: filter .15s, opacity .15s, box-shadow .15s;
+}
+.zone * { pointer-events: none; }
+.zname { display: flex; align-items: center; gap: 1vh; font-size: 2.6vh; }
+.zface { width: 6vh; height: 6vh; border: .4vh solid var(--ink); background: #fff; }
+.arena.edge .zface { width: 8vh; height: 8vh; }
+.zbig { font-size: 6.5vh; line-height: 1.05; }
+.arena.edge .zbig { font-size: 9vh; }
+.zsub { font-size: 2.6vh; min-height: 1.3em; }
+.zbadge { position: absolute; left: 1vh; right: 1vh; bottom: .8vh; font-size: 2.1vh; background: var(--ink); color: #fff; border-radius: 99vh; padding: .3vh 1vh; }
+.zbadge:empty { display: none; }
+.zone.out { filter: grayscale(1) brightness(.55); }
+.zone.dim { opacity: .45; }
+.zone.active { box-shadow: 0 0 0 .8vh #fff, 0 0 6vh 1.5vh var(--c); }
+.zone.win { box-shadow: inset 0 0 0 1.4vh #fff, 0 1vh 0 var(--ink); animation: cheer .4s ease-in-out 3 alternate; }
+.zone.pressed { filter: brightness(1.2); }
+@keyframes cheer { to { transform: scale(1.04) rotate(1.5deg); } }
+
+/* punishments the tablet enforces (on the wrapper so they combine with zone animations) */
+.pwrap.p-shrink { transform: scale(.42); }
+.pwrap.p-drift { animation: drift 2.2s ease-in-out infinite alternate; }
+@keyframes drift { from { transform: translate(-27%, -22%) scale(.45); } to { transform: translate(27%, 22%) scale(.45); } }
+.pwrap.p-flip { transform: rotate(180deg); }
+.pwrap.p-blackout::after { content: ''; position: absolute; inset: 0; background: #000; border-radius: 4vh; pointer-events: none; animation: peek 3s infinite; }
+@keyframes peek { 0%, 76% { opacity: 1; } 82%, 95% { opacity: 0; } 100% { opacity: 1; } }
+
+/* ---------- mini game stage pieces (sized from the stage height, --sh) ---------- */
+.num { font-size: calc(var(--sh) * .6); line-height: 1; color: var(--gold); }
+.unit { font-size: calc(var(--sh) * .16); color: #9aa0d8; margin-left: 1.5vh; }
+
+.light { width: calc(var(--sh) * .78); height: calc(var(--sh) * .78); border-radius: 50%; background: #e0343a; border: .6vh solid var(--ink); box-shadow: 0 0 6vh #e0343a; }
+.light.go { background: #2fe06e; box-shadow: 0 0 10vh #2fe06e; }
+.light.off { background: #33364f; box-shadow: none; }
+.light.fake { background: #3fa2ff; box-shadow: 0 0 8vh #3fa2ff; }
+.light.fake.f2 { background: #ffc526; box-shadow: 0 0 8vh #ffc526; }
+
+.track { position: absolute; left: 4%; right: 4%; top: 50%; height: calc(var(--sh) * .34); transform: translateY(-50%); background: #3b3f55; border-radius: 1.5vh; }
+.track::before { content: ''; position: absolute; left: 0; right: 0; top: 50%; border-top: .5vh dashed #8c90aa; }
+.tzone { position: absolute; top: -12%; bottom: -12%; background: rgba(56, 210, 115, .4); border: .6vh solid #38d273; border-radius: 1.5vh; }
+.car { position: absolute; top: 50%; font-size: calc(var(--sh) * .36); line-height: 1; transform: translate(-50%, -55%) scaleX(-1); transition: opacity .35s; }
+.car.hidden { opacity: 0; }
+.pin { position: absolute; top: -20%; bottom: -20%; width: 1.4vh; margin-left: -.7vh; border-radius: .7vh; border: .35vh solid #fff; }
+
+.tower { display: flex; flex-direction: column-reverse; align-items: center; transform-origin: 50% 100%; animation: wobble .45s ease-in-out infinite alternate; --w: 0deg; }
+.tower i { display: block; height: calc(var(--sh) * .115); margin-top: .3vh; border-radius: 1vh; background: var(--gold); border: .35vh solid var(--ink); }
+.tower i:nth-child(odd) { background: #ff9d3d; }
+@keyframes wobble { from { transform: rotate(calc(var(--w) * -1)); } to { transform: rotate(var(--w)); } }
+.tower.broken { animation: none; }
+.tower.broken i { transition: transform .5s ease-in, opacity .7s; opacity: .25; }
+
+@media (prefers-reduced-motion: reduce) {
+  .scene.enter > *, .gicon, .trophy, .pod.champ, .tower { animation: none; }
+}
+
+/* ---------- touchable parts inside a zone (Phase 2) ---------- */
+.zone .hit, .zone .hit * { pointer-events: auto; }
+.zpane { display: flex; justify-content: center; max-width: 100%; }
+.zpane:empty { display: none; }
+.zbig.cat { font-size: 4.6vh; line-height: 1.1; }
+.arena.edge .zbig.cat { font-size: 6vh; }
+.arena.corners .zname { font-size: 2.2vh; }
+
+/* It's the same! */
+.swatch-big { width: calc(var(--sh) * .75); height: calc(var(--sh) * .75); border-radius: 3vh; border: .7vh solid var(--ink); box-shadow: 0 0 0 .6vh #fff; }
+.swatches { display: flex; gap: 1.4vh; }
+.swatch { width: 12vh; height: 12vh; border-radius: 2.2vh; border: .5vh solid var(--ink); box-shadow: 0 .7vh 0 var(--ink); transition: transform .08s, opacity .2s; }
+.arena.corners .swatch { width: 8vh; height: 8vh; }
+.swatch.picked { transform: translateY(.6vh); box-shadow: 0 0 0 .6vh #fff; }
+.swatch.right { box-shadow: 0 0 0 .8vh #fff, 0 0 3vh #fff; }
+.swatch.faded { opacity: .3; }
+
+/* I know, I know! */
+.pads { display: flex; gap: 2.4vh; }
+.pad { display: flex; align-items: center; justify-content: center; line-height: 1; color: rgba(22, 24, 43, .6); background: var(--pc); border: .6vh solid var(--ink); border-radius: 2.5vh; transition: filter .08s, transform .08s, box-shadow .08s; }
+.stagebox .pad { width: calc(var(--sh) * .55); height: calc(var(--sh) * .55); font-size: calc(var(--sh) * .26); filter: brightness(.42) saturate(.7); }
+.stagebox .pad.lit { filter: none; transform: scale(1.1); box-shadow: 0 0 6vh var(--pc); }
+.zpane .pads { gap: 1.2vh; }
+.zpane .pad { width: 11vh; height: 11vh; font-size: 5vh; box-shadow: 0 .7vh 0 var(--ink); }
+.arena.corners .zpane .pad { width: 8vh; height: 8vh; font-size: 3.6vh; }
+.zpane .pad:active { transform: translateY(.6vh); box-shadow: 0 .1vh 0 var(--ink); }
+
+/* That's not fair! */
+.star { position: absolute; z-index: 2; display: flex; align-items: center; justify-content: center; line-height: 1; filter: drop-shadow(0 .5vh 0 var(--ink)); }
+.star.moving { animation: dodge .8s ease-in-out infinite alternate; }
+@keyframes dodge { from { transform: translate(-35%, 25%); } to { transform: translate(35%, -25%); } }
+
+/* Hurry up! */
+.bomb { font-size: calc(var(--sh) * .7); line-height: 1; animation: shake var(--tick, 650ms) ease-in-out infinite alternate; }
+.bomb.boom { animation: blast .5s ease-out; }
+@keyframes shake { from { transform: rotate(-9deg); } to { transform: rotate(9deg) scale(1.06); } }
+@keyframes blast { from { transform: scale(.4); } to { transform: scale(1.3); } }
+.zone.nope { animation: nope .12s ease-in-out 4 alternate; }
+@keyframes nope { from { transform: translateX(-1.2vh); } to { transform: translateX(1.2vh); } }
+
+/* ---------- main menu button and confirm ---------- */
+.homebtn {
+  display: none; position: fixed; z-index: 50; top: 1.6vh; left: 50%; transform: translateX(-50%);
+  width: 6vh; height: 6vh; border-radius: 50%; font-size: 3vh; line-height: 1;
+  background: rgba(255, 255, 255, .14); border: .35vh solid rgba(255, 255, 255, .25);
+}
+.homebtn:active { background: rgba(255, 255, 255, .3); }
+body.in-cup .homebtn { display: block; }
+
+
+.cbox { display: flex; flex-direction: column; align-items: center; gap: 3vh; background: var(--panel); border: .6vh solid var(--ink); border-radius: 4vh; padding: 5vh 6vh; box-shadow: 0 1.2vh 0 var(--ink); animation: pop .4s cubic-bezier(.2, 1.6, .4, 1); }
+
+/* Intro: optional read-the-rules button next to READY */
+.btn.readrules { font-size: 2.6vh; padding: 1.2vh 2.4vh; border-radius: 99vh; }
+
+/* ---------- explosion (Hurry up!) ---------- */
+.zone.blast { animation: blast-zone 1s ease-out; }
+@keyframes blast-zone {
+  0% { filter: brightness(3.2) saturate(.2); transform: scale(1.14); }
+  12% { transform: scale(1.08) rotate(-4deg) translateX(-1.5vh); }
+  24% { filter: brightness(1.8); transform: scale(1.05) rotate(4deg) translateX(1.5vh); }
+  38% { transform: rotate(-3deg) translateX(-1vh); }
+  52% { transform: rotate(2deg) translateX(1vh); }
+  68% { filter: brightness(1.2); transform: rotate(-1deg); }
+  100% { filter: none; transform: none; }
+}
+.spark { position: absolute; left: 50%; top: 50%; z-index: 5; font-size: 7vh; line-height: 1; pointer-events: none; animation: spark .95s ease-out forwards; }
+@keyframes spark {
+  from { transform: translate(-50%, -50%) scale(.3); opacity: 1; }
+  70% { opacity: 1; }
+  to { transform: translate(calc(-50% + var(--dx)), calc(-50% + var(--dy))) scale(1.4) rotate(var(--rot)); opacity: 0; }
+}
+
+/* ---------- pause ---------- */
+.pausebtn {
+  display: none; position: fixed; z-index: 50; top: 1.4vh; left: 50%; transform: translateX(-50%);
+  width: 11vh; height: 11vh; border-radius: 50%; font-size: 5.5vh; line-height: 1; color: var(--ink);
+  background: #fff; border: .6vh solid var(--ink); box-shadow: 0 .9vh 0 var(--ink);
+}
+.pausebtn:active { transform: translateX(-50%) translateY(.6vh); box-shadow: 0 .2vh 0 var(--ink); }
+body.in-game .pausebtn { display: block; }
+body.in-game .homebtn { display: none; }
+body.paused .arena *, body.paused .arena *::before, body.paused .arena *::after { animation-play-state: paused !important; }
+.overlay { position: fixed; inset: 0; z-index: 60; background: rgba(10, 11, 30, .82); display: flex; align-items: center; justify-content: center; touch-action: none; }
+.overlay[hidden] { display: none; }
+.pausebox .title { font-size: 12vh; }
+/* 2–3 players: the stage centre holds the game picture, so the pause button sits in its top-left corner. */
+body:has(.arena.edge) .pausebtn { left: 3vh; top: 3vh; transform: none; }
+body:has(.arena.edge) .pausebtn:active { transform: translateY(.6vh); }
+
+/* ---------- Phase 3 ---------- */
+/* Setup: smaller tiles so every game fits on two rows. */
+.tiles { max-width: 66vw; gap: 1vh; }
+.btn.tile { width: 12.5vh; padding: .5vh; font-size: 1.6vh; border-width: .45vh; box-shadow: 0 .6vh 0 var(--ink); }
+.tile i { font-size: 3.8vh; }
+
+/* Look away! */
+.lookaway { display: flex; flex-direction: column; align-items: center; gap: 1vh; font-size: calc(var(--sh) * .3); line-height: 1; }
+.lookaway div { font-size: max(3vh, calc(var(--sh) * .1)); line-height: 1.2; color: var(--gold); text-align: center; }
+.secret { display: none; position: absolute; inset: 0; z-index: 4; background: #fff; color: var(--ink); border-radius: 3.4vh; align-items: center; justify-content: center; padding: 1vh; }
+.secret.show { display: flex; }
+.btn.gotit { font-size: 2.6vh; padding: .8vh 2.4vh; background: #38d273; }
+.cardbox { display: flex; flex-direction: column; align-items: center; gap: .4vh; text-align: center; }
+.cardbox .cardpic { font-size: 9vh; line-height: 1; }
+.arena.corners .cardbox .cardpic { font-size: 6vh; }
+.cardname { font-size: 2.2vh; }
+.verdict { font-size: 3.4vh; padding: .3vh 2vh; border-radius: 99vh; color: #fff; }
+.verdict.truth { background: #1f9d55; }
+.verdict.lie { background: #e0343a; }
+.cardsay { font-size: 2.4vh; }
+.cardreveal { display: flex; align-items: center; gap: 4vh; }
+.cardreveal .cardpic { font-size: calc(var(--sh) * .6); line-height: 1; }
+.stamp { font-size: calc(var(--sh) * .2); padding: 1vh 3vh; border: .8vh solid; border-radius: 2vh; transform: rotate(-8deg); animation: pop .4s cubic-bezier(.2, 1.6, .4, 1); }
+.stamp.truth { color: #38d273; }
+.stamp.lie { color: #ff5d62; }
+.votes { display: flex; gap: 1.6vh; }
+.btn.vote { font-size: 3vh; padding: 1.2vh 2.4vh; }
+.arena.corners .btn.vote { font-size: 2.3vh; padding: .8vh 1.6vh; }
+
+/* But you said…! */
+.cw { font-weight: 700; -webkit-text-stroke: .12vh var(--ink); paint-order: stroke fill; }
+.order { font-size: calc(var(--sh) * .16); text-align: center; padding: 0 4vh; line-height: 1.25; }
+.bys { display: flex; flex-direction: column; align-items: center; gap: 1vh; }
+.instr { background: var(--ink); color: #fff; border-radius: 99vh; padding: .5vh 2.2vh; font-size: 2.8vh; white-space: nowrap; }
+.arena.corners .instr { font-size: 2.1vh; }
+
+/* That's mine! */
+.grab { display: flex; flex-direction: column; align-items: center; gap: 2vh; }
+.prompt { font-size: max(2.8vh, calc(var(--sh) * .11)); color: var(--gold); text-align: center; padding: 0 3vh; }
+.flyrow { display: flex; gap: 3vh; }
+.fly { font-size: calc(var(--sh) * .28); line-height: 1; animation: flyin .8s cubic-bezier(.2, 1.3, .4, 1) var(--d, 0ms) backwards; }
+@keyframes flyin { from { transform: translateX(var(--fx, 40vw)) rotate(540deg) scale(.4); opacity: 0; } }
+.objs { display: flex; gap: 1vh; }
+.objs.locked { opacity: .5; }
+.obj { width: 10vh; height: 10vh; display: flex; align-items: center; justify-content: center; font-size: 6vh; background: #fff; border: .5vh solid var(--ink); border-radius: 2vh; box-shadow: 0 .6vh 0 var(--ink); }
+.arena.corners .obj { width: 7.5vh; height: 7.5vh; font-size: 4.4vh; }
+.obj.taken { opacity: .3; box-shadow: 0 0 0 .6vh var(--owner); }
+.obj.mine { box-shadow: 0 0 0 .8vh #fff, 0 0 0 1.4vh var(--owner); transform: scale(1.08); }
+.reveal { display: flex; flex-direction: column; align-items: center; gap: 1vh; font-size: calc(var(--sh) * .26); line-height: 1; padding: 1vh; border-radius: 2vh; box-shadow: 0 0 0 .7vh var(--owner); }
+.reveal.unclaimed { opacity: .45; }
+.tag { font-size: calc(var(--sh) * .14); background: var(--gold); color: var(--ink); border: .5vh solid var(--ink); border-radius: 1.5vh; padding: .2vh 1.6vh; animation: pop .45s cubic-bezier(.2, 1.6, .4, 1) backwards .3s; }
+
+/* I forgot! */
+.memo { font-size: 26vh; line-height: 1; animation: bob 1s ease-in-out infinite alternate; }
+.opt6 { display: grid; grid-template-columns: repeat(3, auto); gap: 1vh; }
+.arena.edge .opt6 { grid-template-columns: repeat(6, auto); }
+.opt { display: flex; flex-direction: column; align-items: center; background: #fff; border: .45vh solid var(--ink); border-radius: 1.6vh; padding: .4vh .8vh; font-size: 5vh; line-height: 1; box-shadow: 0 .5vh 0 var(--ink); }
+.opt small { font-size: 1.5vh; margin-top: .3vh; }
+.arena.corners .opt { font-size: 3.6vh; }
+.opt.picked { box-shadow: 0 0 0 .6vh #fff; }
+.opt.right { box-shadow: 0 0 0 .8vh #fff, 0 0 3vh #fff; }
+.opt.faded { opacity: .3; }
+
+/* A punishment label sits at the bottom of the zone: keep the zone contents clear of it. */
+.zone:has(.zbadge:not(:empty)) { padding-bottom: 4.6vh; }
+.zone:has(.zbadge:not(:empty)) .zname { margin-top: -1vh; }
+
+/* ---------- Phase 4 ---------- */
+/* Stage content is never touchable, and sits above the drawing canvas so answers show on top. */
+.stagebox { z-index: 2; pointer-events: none; }
+
+/* You cheated! */
+.race { width: 88%; display: flex; flex-direction: column; gap: calc(var(--sh) * .04); }
+.lane2 { position: relative; height: calc(var(--sh) * .26); border-bottom: .4vh dashed #4a4f78; }
+.runner { position: absolute; left: 0; bottom: 0; font-size: calc(var(--sh) * .23); line-height: 1; transition: left .35s ease-out; transform: scaleX(-1); }
+.runner.teleport { transition: none; }
+.finish { position: absolute; right: 0; bottom: 0; font-size: calc(var(--sh) * .2); line-height: 1; }
+.cups { position: relative; width: 80%; height: 100%; }
+.cup { position: absolute; bottom: 18%; transform: translateX(-50%); font-size: calc(var(--sh) * .42); line-height: 1; z-index: 2; transition: left .5s ease-in-out, bottom .35s ease-out; }
+.cup.lift { bottom: 48%; }
+.ball { position: absolute; bottom: 18%; transform: translateX(-50%); font-size: calc(var(--sh) * .2); line-height: 1; z-index: 1; opacity: 0; transition: left .5s ease-in-out; }
+.ball.show { opacity: 1; }
+
+/* What IS that?! */
+.sketch { position: absolute; inset: 0; width: 100%; height: 100%; z-index: 1; background: #fffdf5; border-radius: 3vh; touch-action: none; cursor: crosshair; }
+.answer { background: var(--gold); color: var(--ink); border: .6vh solid var(--ink); border-radius: 3vh; padding: 1.5vh 4vh; font-size: calc(var(--sh) * .14); box-shadow: 0 1vh 0 var(--ink); animation: pop .45s cubic-bezier(.2, 1.6, .4, 1); }
+.btn.clearbtn { font-size: 2.4vh; padding: .8vh 2vh; }
+
+/* Bigger secret card in the large 2–3 player zones. */
+.arena.edge .cardbox .cardpic { font-size: 15vh; }
+.arena.edge .cardname, .arena.edge .cardsay { font-size: 3.2vh; }
+.arena.edge .verdict { font-size: 5vh; }

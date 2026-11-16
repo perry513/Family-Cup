@@ -1,0 +1,11 @@
+{
+  "name": "Family Cup",
+  "short_name": "Family Cup",
+  "start_url": "./",
+  "scope": "./",
+  "display": "fullscreen",
+  "orientation": "landscape",
+  "background_color": "#14152e",
+  "theme_color": "#14152e",
+  "icons": [{ "src": "icon.svg", "sizes": "any", "type": "image/svg+xml", "purpose": "any maskable" }]
+}

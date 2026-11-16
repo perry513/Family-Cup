@@ -1,0 +1,19 @@
+{
+  "name": "family-cup",
+  "private": true,
+  "version": "0.1.0",
+  "description": "Family party game for 2-4 players on one tablet: a cup of mini games with a punishment wheel.",
+  "type": "module",
+  "scripts": {
+    "dev": "vite --host",
+    "build": "tsc --noEmit && vite build",
+    "preview": "vite preview --host",
+    "test": "vitest run",
+    "typecheck": "tsc --noEmit"
+  },
+  "devDependencies": {
+    "typescript": "^7.0.2",
+    "vite": "^8.3.8",
+    "vitest": "^5.1.0"
+  }
+}
